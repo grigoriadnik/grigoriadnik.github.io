@@ -52,3 +52,8 @@
   .acct .slot .lbl { grid-column: 1 / -1; }
   .acct .slot .el, .acct .slot .sp { grid-column: span 1; }
 }
+.acct .hint { font-size: .78rem; color: var(--muted); line-height: 1.35; }
+.acct .small { font-size: .85rem; }
+.acct h3 { font-size: 1rem; margin: 1rem 0 .3rem; }
+.acct .editor { background: var(--card-2); border-color: var(--accent); }
+.acct a { color: var(--accent); }

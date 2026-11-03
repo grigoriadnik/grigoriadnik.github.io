@@ -20,7 +20,9 @@ const ready = (async () => {
     py.FS.writeFile("/st/" + rel, "");
   }
   py.runPython("import sys; sys.path.insert(0, '/st'); import stsite");
-  return py.pyimport("stsite");
+  const st = py.pyimport("stsite");
+  st.VERSION = version; // the extension scripts the pages load get ?v=<bundle version>
+  return st;
 })();
 
 const OPS = {

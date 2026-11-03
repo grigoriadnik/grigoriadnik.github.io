@@ -1,5 +1,6 @@
 // The account page: the player's heroes (6 slots, skills), storage, blueprints, import / export, and the button
 // that runs the review. Every change is written as a data/roster file (data/roster/SCHEMA.md) through STAccount.
+// English only, with a hint under every field: the guild players meet the tool here first.
 (function () {
   "use strict";
   const A = window.STAccount;
@@ -23,6 +24,7 @@
   const now = () => new Date().toISOString().replace(/\.\d+Z$/, "+00:00");
   const heroPath = (name) => `data/roster/heroes/${name}.json`;
   const safeName = (s) => s.trim().replace(/[\/\\]/g, "-").replace(/^\.+/, "");
+  const hint = (text) => h("span", { class: "hint" }, text);
 
   function load(f) {
     files = f;
@@ -58,43 +60,48 @@
     const u = A.user();
     const n = Object.keys(heroes).length;
     return h("section", { class: "card" },
-      h("h1", {}, "Ο λογαριασμός μου"),
+      h("h1", {}, "My account"),
       h("p", { class: "muted" }, u.mode === "local"
-        ? "Χωρίς σύνδεση: τα δεδομένα μένουν μόνο σε αυτόν τον browser. Με «Σύνδεση» (πάνω δεξιά) τα βλέπεις από κάθε συσκευή."
-        : `Συνδεδεμένος ως ${u.name}. Τα δεδομένα σου τα βλέπεις μόνο εσύ, από κάθε συσκευή.`),
+        ? "Not signed in: your data stays in this browser only. Sign in with Discord (top right) to see it on every device."
+        : `Signed in as ${u.name}. Only you can see your data, from any device.`),
+      h("h3", {}, "How it works"),
       h("ol", { class: "steps" },
-        h("li", {}, "Βάλε τους ήρωές σου: class, level, skills και τα 6 slots (item, quality, element, spirit)."),
-        h("li", {}, "Στην «Αποθήκη» βάλε ό,τι Epic/Legendary items και enchants έχεις, και τα Titan Soul / dice."),
-        h("li", {}, "Στα «Blueprints» βάλε όσα έχεις ξεκλειδώσει (για να σου λέει «craft it yourself»)."),
-        h("li", {}, "Πάτα «Υπολογισμός». Μετά δες «Ήρωες» (review ανά slot), «Ομάδα» και «Bucket list» (τι λείπει από το ιδανικό build).")),
+        h("li", {}, h("b", {}, "Add your heroes"), " below: class, level, power, skills and what each of the 6 slots wears now (item, quality, element, spirit). Start with your strongest few; you can add more later."),
+        h("li", {}, h("b", {}, "Fill in your storage"), " (optional but useful): Epic and Legendary items and enchants you already own, plus Titan Souls and skill dice. The site uses what you own first, because it is free."),
+        h("li", {}, h("b", {}, "Add your blueprints"), " (optional): items you can craft. The site then says “craft it yourself” instead of “buy it on the Market”."),
+        h("li", {}, h("b", {}, "Press “Compute”"), ". The site works out the best build for every hero and what is missing. It runs in your browser and takes about 10–60 seconds per hero; keep the tab in front."),
+        h("li", {}, h("b", {}, "Read the results"), ": ", h("a", { href: "/" }, "Heroes"), " (each hero, slot by slot, with a what-if panel), ",
+          h("a", { href: "/team" }, "Team"), " (your whole roster in charts) and ", h("a", { href: "/ext/bucket.html" }, "Bucket list"),
+          " (what to craft or buy, biggest win first). New here? Read the ", h("a", { href: "/guide/" }, "Guide"), ".")),
       h("div", { class: "actions" },
-        h("button", { class: "primary", onclick: recompute, disabled: n ? null : true }, `Υπολογισμός (${n} ήρωες)`),
-        h("button", { onclick: () => importInput.click() }, "Εισαγωγή αρχείων"),
-        h("button", { onclick: exportAll }, "Εξαγωγή (αρχείο)"),
-        n ? h("button", { class: "danger", onclick: wipe }, "Σβήσε τα πάντα") : null));
+        h("button", { class: "primary", onclick: recompute, disabled: n ? null : true }, `Compute (${n} heroes)`),
+        h("button", { onclick: () => importInput.click() }, "Import files"),
+        h("button", { onclick: exportAll }, "Export (backup file)"),
+        n ? h("button", { class: "danger", onclick: wipe }, "Delete everything") : null),
+      h("p", { class: "muted small" }, "Import takes hero, inventory and blueprint files from the Claude Code version of this tool (data/roster/*.json), or a backup made with Export."));
   }
 
   function banner() {
     if (!dirty) return null;
-    return h("div", { class: "banner" }, h("span", { class: "grow" }, "Άλλαξαν δεδομένα: πάτα «Υπολογισμός» για νέο review και bucket list."),
-      h("button", { class: "primary", onclick: recompute }, "Υπολογισμός"));
+    return h("div", { class: "banner" }, h("span", { class: "grow" }, "Your data changed. Press “Compute” to update the review and the bucket list."),
+      h("button", { class: "primary", onclick: recompute }, "Compute"));
   }
 
   function heroList() {
     const names = Object.keys(heroes).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
     return h("section", { class: "card" },
-      h("h2", {}, "Ήρωες", h("span", { class: "muted" }, `(${names.length})`), h("span", { class: "grow" }),
-        h("button", { class: "primary", onclick: () => { editing = blankHero(); render(); } }, "+ Νέος ήρωας")),
+      h("h2", {}, "Heroes", h("span", { class: "muted" }, `(${names.length})`), h("span", { class: "grow" }),
+        h("button", { class: "primary", onclick: () => { editing = blankHero(); render(); } }, "+ New hero")),
       editing ? editor() : null,
       names.length ? h("div", { class: "heroes" }, names.map((n) => {
         const d = heroes[n];
         const gear = (d.slots || []).filter((s) => s.item).map((s) => `${s.item}${s.quality && s.quality !== "Epic" ? " (" + s.quality + ")" : ""}`).join(" · ");
         return h("div", { class: "hero-row" },
-          h("span", { class: "name" }, n), h("span", {}, `${d.class || "?"} · L${d.level || "?"}`),
-          h("span", { class: "gear" }, gear || "χωρίς gear"),
-          h("button", { class: "small", onclick: () => { editing = JSON.parse(JSON.stringify(d)); editing._was = n; render(); } }, "Αλλαγή"),
-          h("button", { class: "small danger", onclick: () => delHero(n) }, "Διαγραφή"));
-      })) : h("p", { class: "muted" }, "Κανένας ήρωας ακόμα."));
+          h("span", { class: "name" }, n), h("span", {}, `${d.class || "?"} · L${d.level || "?"} · ${((d.stats || {}).power || 0).toLocaleString("en")} power`),
+          h("span", { class: "gear" }, gear || "no gear yet"),
+          h("button", { class: "small", onclick: () => { editing = JSON.parse(JSON.stringify(d)); editing._was = n; render(); } }, "Edit"),
+          h("button", { class: "small danger", onclick: () => delHero(n) }, "Delete"));
+      })) : h("p", { class: "muted" }, "No heroes yet. Press “+ New hero” and copy one from the game."));
   }
 
   function blankHero() {
@@ -105,83 +112,88 @@
   function editor() {
     const e = editing;
     const c = cls(e.class);
-    const errs = [];
-    const field = (label, input) => h("label", { class: "f" }, label, input);
+    const field = (label, input, help) => h("label", { class: "f" }, label, input, help ? hint(help) : null);
     const classSel = h("select", { onchange: (ev) => { e.class = ev.target.value; e.promoted = !!(cls(e.class) || {}).promoted; render(); } },
-      h("option", { value: "" }, "— διάλεξε —"),
+      h("option", { value: "" }, "— pick the class —"),
       ["Fighter", "Rogue", "Spellcaster"].map((type) => h("optgroup", { label: type },
         cat.classes.filter((x) => x.type === type).map((x) => h("option", { value: x.name, selected: x.name === e.class }, x.name)))));
     const skillNames = skillsFor(c).flatMap((s) => [s.name, ...s.tiers.slice(1)]);
     const top = h("div", { class: "grid" },
-      field("Όνομα ήρωα", h("input", { value: e.hero, placeholder: "όπως στο παιχνίδι", oninput: (ev) => { e.hero = ev.target.value; } })),
-      field("Class", classSel),
-      field("Level", h("input", { type: "number", min: 1, max: 60, value: e.level, oninput: (ev) => { e.level = +ev.target.value || null; } })),
-      field("Element (όπως δείχνει, προαιρετικό)", h("input", { type: "number", min: 0, value: e.elementShown, oninput: (ev) => { e.elementShown = ev.target.value === "" ? null : +ev.target.value; } })),
-      field("Card level (Card Collection, προαιρετικό)", h("input", { type: "number", min: 0, max: 10, value: e.cardLevel, oninput: (ev) => { e.cardLevel = ev.target.value === "" ? null : +ev.target.value; } })),
-      field("Power (όπως το δείχνει το παιχνίδι)", h("input", { type: "number", min: 0, value: (e.stats || {}).power, oninput: (ev) => { e.stats = Object.assign({}, e.stats, { power: ev.target.value === "" ? null : +ev.target.value }); } })));
-    const skills = h("div", { class: "skills" }, list("sk-list", skillNames), [0, 1, 2, 3].map((i) => {
-      const v = (e.skills || [])[i] || "";
-      const known = !v || skillNames.includes(v) || cat.skills.some((s) => s.tiers.includes(v));
-      if (!known) errs.push(`άγνωστο skill «${v}»`);
-      return field(`Skill ${i + 1}`, h("input", { list: "sk-list", value: v, class: known ? null : "bad", placeholder: "όνομα skill",
-        onchange: (ev) => { e.skills = e.skills || []; e.skills[i] = ev.target.value.trim(); e.skills = e.skills.filter((x, j) => x || j < 4); render(); } }));
-    }));
-    const slots = h("div", { class: "slots" },
-      list("el-list", cat.elements), list("sp-list", cat.spirits),
-      (e.slots || []).map((s, i) => {
-        const types = c ? c.slots[String(s.slot)] || [] : [];
-        const its = itemsFor(types);
-        its.forEach((it) => itemByName.set(it.name, it));
-        const id = `it-${s.slot}`;
-        const okItem = !s.item || its.some((it) => it.name === s.item);
-        const okEl = !s.element || cat.elements.includes(s.element);
-        const okSp = !s.spirit || cat.spirits.includes(s.spirit);
-        if (!okItem) errs.push(`slot ${s.slot}: το «${s.item}» δεν μπαίνει εδώ (${types.join("/") || "διάλεξε class"})`);
-        if (!okEl) errs.push(`slot ${s.slot}: άγνωστο element «${s.element}»`);
-        if (!okSp) errs.push(`slot ${s.slot}: άγνωστο spirit «${s.spirit}»`);
-        const set = (k) => (ev) => {
-          const v = ev.target.value.trim() || null;
-          const next = Object.assign({}, s, { [k]: v });
-          delete next.empty;
-          if (!next.item) { e.slots[i] = { slot: s.slot, empty: true }; } else {
-            const it = itemByName.get(next.item);
-            next.quality = next.quality || "Epic";
-            if (it) { next.tier = it.tier; next.type = it.type; }
-            e.slots[i] = next;
-          }
-          render();
-        };
-        return h("div", { class: "slot" },
-          h("span", { class: "lbl" }, `Slot ${s.slot}`, h("br"), types.join(" / ") || "—"),
-          list(id, its.map((it) => it.name)),
-          h("input", { list: id, value: s.item || "", class: okItem ? null : "bad", placeholder: "item (κενό = άδειο)", onchange: set("item") }),
-          h("select", { onchange: set("quality"), disabled: s.item ? null : true },
-            cat.qualities.map((q) => h("option", { value: q, selected: (s.quality || "Epic") === q }, q))),
-          h("input", { class: "el" + (okEl ? "" : " bad"), list: "el-list", value: s.element || "", placeholder: "element", onchange: set("element"), disabled: s.item ? null : true }),
-          h("input", { class: "sp" + (okSp ? "" : " bad"), list: "sp-list", value: s.spirit || "", placeholder: "spirit", onchange: set("spirit"), disabled: s.item ? null : true }));
-      }));
-    if (!e.hero.trim()) errs.push("βάλε όνομα");
-    if (!c) errs.push("διάλεξε class");
-    return h("div", { class: "card", style: "background:var(--card-2)" },
-      h("h2", {}, e._was ? `Αλλαγή: ${e._was}` : "Νέος ήρωας"),
+      field("Hero name", h("input", { value: e.hero, placeholder: "as in the game", oninput: (ev) => { e.hero = ev.target.value; } }),
+            "Any name you like; it just tells your heroes apart."),
+      field("Class", classSel, "The class shown on the hero screen. A promoted class (e.g. Sensei, not Ninja) counts as promoted."),
+      field("Level", h("input", { type: "number", min: 1, max: 60, value: e.level, oninput: (ev) => { e.level = +ev.target.value || null; } }),
+            "Sets the highest item tier the hero can wear."),
+      field("Power (required)", h("input", { type: "number", min: 0, value: (e.stats || {}).power, oninput: (ev) => { e.stats = Object.assign({}, e.stats, { power: ev.target.value === "" ? null : +ev.target.value }); } }),
+            "The hero's power as the game shows it. The site checks its own maths against it."),
+      field("Element (optional)", h("input", { type: "number", min: 0, value: e.elementShown, oninput: (ev) => { e.elementShown = ev.target.value === "" ? null : +ev.target.value; } }),
+            "The element number on the hero screen. Leave empty if unsure."),
+      field("Card level (optional)", h("input", { type: "number", min: 0, max: 10, value: e.cardLevel, oninput: (ev) => { e.cardLevel = ev.target.value === "" ? null : +ev.target.value; } }),
+            "Collection Book → Card Collection: the level of this hero's class card."));
+    const skills = h("div", {},
+      h("h3", {}, "Skills"),
+      h("p", { class: "muted small" }, "The 4 skills next to the innate one, in the game's order. Any tier's name works (e.g. Death Dealer or its base skill); the site works out the tier from the element. The innate skill comes from the class."),
+      h("div", { class: "skills" }, list("sk-list", skillNames), [0, 1, 2, 3].map((i) => {
+        const v = (e.skills || [])[i] || "";
+        const known = !v || skillNames.includes(v) || cat.skills.some((s) => s.tiers.includes(v));
+        return field(`Skill ${i + 1}`, h("input", { list: "sk-list", value: v, class: known ? null : "bad", placeholder: "start typing a skill name",
+          onchange: (ev) => { e.skills = e.skills || []; e.skills[i] = ev.target.value.trim(); render(); } }), known ? null : "Not a skill this class can have.");
+      })));
+    const slots = h("div", {},
+      h("h3", {}, "Equipment"),
+      h("p", { class: "muted small" }, "What each slot wears right now. Leave the item empty for an empty slot. Quality is the item's colour: purple Epic, gold Legendary, cyan Flawless, green Superior, grey Normal. Element and spirit are the enchants on the item (leave empty if none). Start typing and pick from the list."),
+      h("div", { class: "slots" },
+        list("el-list", cat.elements), list("sp-list", cat.spirits),
+        (e.slots || []).map((s, i) => {
+          const types = c ? c.slots[String(s.slot)] || [] : [];
+          const its = itemsFor(types);
+          its.forEach((it) => itemByName.set(it.name, it));
+          const id = `it-${s.slot}`;
+          const okItem = !s.item || its.some((it) => it.name === s.item);
+          const okEl = !s.element || cat.elements.includes(s.element);
+          const okSp = !s.spirit || cat.spirits.includes(s.spirit);
+          const set = (k) => (ev) => {
+            const v = ev.target.value.trim() || null;
+            const next = Object.assign({}, s, { [k]: v });
+            delete next.empty;
+            if (!next.item) { e.slots[i] = { slot: s.slot, empty: true }; } else {
+              const it = itemByName.get(next.item);
+              next.quality = next.quality || "Epic";
+              if (it) { next.tier = it.tier; next.type = it.type; }
+              e.slots[i] = next;
+            }
+            render();
+          };
+          return h("div", { class: "slot" },
+            h("span", { class: "lbl" }, `Slot ${s.slot}`, h("br"), types.join(" / ") || "pick a class first"),
+            list(id, its.map((it) => it.name)),
+            h("input", { list: id, value: s.item || "", class: okItem ? null : "bad", placeholder: "item (empty = nothing)", title: okItem ? "" : "This item does not fit this slot for this class", onchange: set("item") }),
+            h("select", { onchange: set("quality"), disabled: s.item ? null : true, "aria-label": "Quality" },
+              cat.qualities.map((q) => h("option", { value: q, selected: (s.quality || "Epic") === q }, q))),
+            h("input", { class: "el" + (okEl ? "" : " bad"), list: "el-list", value: s.element || "", placeholder: "element enchant", onchange: set("element"), disabled: s.item ? null : true }),
+            h("input", { class: "sp" + (okSp ? "" : " bad"), list: "sp-list", value: s.spirit || "", placeholder: "spirit enchant", onchange: set("spirit"), disabled: s.item ? null : true }));
+        })));
+    const errs = validate(e);
+    return h("div", { class: "card editor" },
+      h("h2", {}, e._was ? `Edit: ${e._was}` : "New hero"),
       top, skills, slots,
-      errs.length ? h("p", { class: "err" }, errs.join(" · ")) : null,
+      errs.length ? h("p", { class: "err" }, "To fix: " + errs.join(" · ")) : null,
       h("div", { class: "actions" },
-        h("button", { class: "primary", onclick: saveHero }, "Αποθήκευση"),
-        h("button", { onclick: () => { editing = null; render(); } }, "Άκυρο")));
+        h("button", { class: "primary", onclick: saveHero }, "Save hero"),
+        h("button", { onclick: () => { editing = null; render(); } }, "Cancel")));
   }
 
   function validate(e) {
     const c = cls(e.class);
     const errs = [];
-    if (!(e.hero || "").trim()) errs.push("βάλε όνομα");
-    if (!c) errs.push("διάλεξε class");
-    if (!((e.stats || {}).power > 0)) errs.push("βάλε το power του ήρωα");
+    if (!(e.hero || "").trim()) errs.push("add a name");
+    if (!c) errs.push("pick the class");
+    if (!((e.stats || {}).power > 0)) errs.push("add the hero's power");
     (e.slots || []).forEach((s) => {
       const types = c ? c.slots[String(s.slot)] || [] : [];
-      if (s.item && !cat.items.some((it) => it.name === s.item && types.includes(it.type))) errs.push(`slot ${s.slot}: «${s.item}»`);
-      if (s.element && !cat.elements.includes(s.element)) errs.push(`slot ${s.slot}: element «${s.element}»`);
-      if (s.spirit && !cat.spirits.includes(s.spirit)) errs.push(`slot ${s.slot}: spirit «${s.spirit}»`);
+      if (s.item && !cat.items.some((it) => it.name === s.item && types.includes(it.type))) errs.push(`slot ${s.slot}: “${s.item}” does not fit (${types.join("/") || "no class"})`);
+      if (s.element && !cat.elements.includes(s.element)) errs.push(`slot ${s.slot}: unknown element “${s.element}”`);
+      if (s.spirit && !cat.spirits.includes(s.spirit)) errs.push(`slot ${s.slot}: unknown spirit “${s.spirit}”`);
     });
     return errs;
   }
@@ -189,7 +201,7 @@
   async function saveHero() {
     const e = editing;
     const errs = validate(e);
-    if (errs.length) { alert("Διόρθωσε πρώτα: " + errs.join(" · ")); render(); return; }
+    if (errs.length) { alert("Please fix first: " + errs.join(" · ")); render(); return; }
     const name = safeName(e.hero);
     const doc = Object.assign({}, e, { hero: name, capturedAt: now(), source: e.source || "site" });
     delete doc._was;
@@ -202,7 +214,7 @@
   }
 
   async function delHero(name) {
-    if (!confirm(`Διαγραφή του «${name}»;`)) return;
+    if (!confirm(`Delete “${name}”?`)) return;
     await A.put(heroPath(name), null);
     delete heroes[name];
     changed();
@@ -216,20 +228,20 @@
 
   function storage() {
     const allItems = cat.items.filter((it) => it.tier >= 10).map((it) => it.name);
-    const row = (arr, i, nameList, render2) => {
+    const row = (arr, i, nameList) => {
       const r = arr[i];
       return h("tr", {},
-        h("td", {}, h("input", { list: nameList, value: r.item || "", onchange: (ev) => { r.item = ev.target.value.trim(); const it = cat.items.find((x) => x.name === r.item); if (it) { r.tier = it.tier; r.type = it.type; } saveInventory(); } })),
-        h("td", {}, h("select", { onchange: (ev) => { r.quality = ev.target.value; saveInventory(); } },
+        h("td", {}, h("input", { list: nameList, value: r.item || "", "aria-label": "Name", onchange: (ev) => { r.item = ev.target.value.trim(); const it = cat.items.find((x) => x.name === r.item); if (it) { r.tier = it.tier; r.type = it.type; } saveInventory(); } })),
+        h("td", {}, h("select", { "aria-label": "Quality", onchange: (ev) => { r.quality = ev.target.value; saveInventory(); } },
           cat.qualities.map((q) => h("option", { value: q, selected: (r.quality || "Epic") === q }, q)))),
-        h("td", { class: "n" }, h("input", { type: "number", min: 0, value: r.count || 0, onchange: (ev) => { r.count = +ev.target.value || 0; saveInventory(); } })),
-        h("td", {}, h("button", { class: "small danger", onclick: () => { arr.splice(i, 1); saveInventory(); render2(); } }, "✕")));
+        h("td", { class: "n" }, h("input", { type: "number", min: 0, value: r.count || 0, "aria-label": "How many", onchange: (ev) => { r.count = +ev.target.value || 0; saveInventory(); } })),
+        h("td", {}, h("button", { class: "small danger", "aria-label": "Remove row", onclick: () => { arr.splice(i, 1); saveInventory(); render(); } }, "✕")));
     };
-    const table = (title, arr, nameList, hint) => h("div", {},
-      h("h3", {}, title), h("p", { class: "muted" }, hint),
-      h("table", {}, h("tr", {}, h("th", {}, "Όνομα"), h("th", {}, "Quality"), h("th", {}, "Πόσα"), h("th", {})),
-        arr.map((_, i) => row(arr, i, nameList, render))),
-      h("div", { class: "actions" }, h("button", { class: "small", onclick: () => { arr.push({ item: "", quality: "Epic", count: 1 }); render(); } }, "+ Γραμμή")));
+    const table = (title, arr, nameList, help) => h("div", {},
+      h("h3", {}, title), h("p", { class: "muted small" }, help),
+      h("table", {}, h("tr", {}, h("th", {}, "Name"), h("th", {}, "Quality"), h("th", {}, "How many"), h("th", {})),
+        arr.map((_, i) => row(arr, i, nameList))),
+      h("div", { class: "actions" }, h("button", { class: "small", onclick: () => { arr.push({ item: "", quality: "Epic", count: 1 }); render(); } }, "+ Add row")));
     const have = (name) => (inventory.consumables.find((c) => c.name === name) || {}).count || 0;
     const setHave = (name, v) => {
       let c = inventory.consumables.find((x) => x.name === name);
@@ -238,16 +250,19 @@
       saveInventory();
     };
     return h("section", { class: "card" },
-      h("h2", {}, "Αποθήκη"),
+      h("h2", {}, "Storage"),
+      h("p", { class: "muted" }, "Optional. What you already own is used first, because equipping it costs nothing. Only Epic and Legendary gear matters: lower qualities are never suggested. Changes save on their own."),
       list("inv-items", allItems), list("inv-ench", [...cat.elements, ...cat.spirits]),
-      table("Items (μόνο Epic / Legendary)", inventory.items, "inv-items", "Ό,τι έχεις στην αποθήκη και θα μπορούσε να φορέσει κάποιος ήρωας."),
-      table("Enchants (elements, spirits)", inventory.enchants, "inv-ench", "Μια γραμμή ανά κάρτα: το ίδιο enchant σε άλλη quality είναι άλλη γραμμή."),
+      table("Items (Epic / Legendary only)", inventory.items, "inv-items", "Gear in storage that one of your heroes could wear."),
+      table("Enchants (elements and spirits)", inventory.enchants, "inv-ench", "One row per card: the same enchant in another quality is a separate row. An item takes only enchants of its own quality or better."),
       h("h3", {}, "Consumables"),
+      h("p", { class: "muted small" }, "Titan Souls go to promotions; skill dice go to rerolls; seeds and blossoms raise stats."),
       h("div", { class: "grid" }, cat.consumables.map((n) => h("label", { class: "f" }, n,
         h("input", { type: "number", min: 0, value: have(n), onchange: (ev) => setHave(n, +ev.target.value || 0) })))),
       h("div", { class: "grid", style: "margin-top:10px" }, h("label", { class: "f" }, "Gems",
         h("input", { type: "number", min: 0, value: inventory.gems == null ? "" : inventory.gems,
-                     onchange: (ev) => { inventory.gems = ev.target.value === "" ? null : +ev.target.value; saveInventory(); } }))));
+                     onchange: (ev) => { inventory.gems = ev.target.value === "" ? null : +ev.target.value; saveInventory(); } }),
+        hint("Only shown for reference; the site never plans to spend gems."))));
   }
 
   function bps() {
@@ -260,14 +275,14 @@
       saveBlueprints();
       render();
     };
-    input = h("input", { list: "bp-list", placeholder: "όνομα item", onkeydown: (ev) => { if (ev.key === "Enter") add(); } });
+    input = h("input", { list: "bp-list", placeholder: "item name", onkeydown: (ev) => { if (ev.key === "Enter") add(); } });
     return h("section", { class: "card" },
       h("h2", {}, "Blueprints", h("span", { class: "muted" }, `(${blueprints.unlocked.length})`)),
-      h("p", { class: "muted" }, "Όσα έχεις ξεκλειδώσει από τα items που σε ενδιαφέρουν (T13+). Ό,τι δεν είναι εδώ, το site το προτείνει από το Market."),
+      h("p", { class: "muted" }, "Optional. Blueprints you have unlocked for the items your heroes could use (tier 13 and up is enough). Crafting is cheaper than buying, so an item here is marked “craft it yourself”; anything else is suggested from the Market."),
       list("bp-list", names),
-      h("div", { class: "actions" }, input, h("button", { onclick: add }, "Προσθήκη")),
+      h("div", { class: "actions" }, input, h("button", { onclick: add }, "Add")),
       h("div", { class: "chips" }, blueprints.unlocked.slice().sort().map((n) => h("span", { class: "chip" }, n,
-        h("button", { "aria-label": "Αφαίρεση " + n, onclick: () => { blueprints.unlocked = blueprints.unlocked.filter((x) => x !== n); saveBlueprints(); render(); } }, "✕")))));
+        h("button", { "aria-label": "Remove " + n, onclick: () => { blueprints.unlocked = blueprints.unlocked.filter((x) => x !== n); saveBlueprints(); render(); } }, "✕")))));
   }
 
   function saveBlueprints() {
@@ -283,8 +298,8 @@
     const r = await A.recompute();
     dirty = false;
     root.prepend(h("div", { class: "banner" + (r.ok ? " ok" : "") },
-      h("span", { class: "grow" }, r.ok ? `Έτοιμο: review για ${r.heroes} ήρωες.` : "Δεν βγήκε: " + r.error),
-      r.ok ? h("a", { class: "btn", href: "/" }, "Ήρωες") : null, r.ok ? h("a", { class: "btn", href: "/ext/bucket.html" }, "Bucket list") : null));
+      h("span", { class: "grow" }, r.ok ? `Done: review ready for ${r.heroes} heroes. Open Heroes to see each one slot by slot, or the Bucket list for what to gather.` : "Could not compute: " + r.error),
+      r.ok ? h("a", { class: "btn", href: "/" }, "Heroes") : null, r.ok ? h("a", { class: "btn", href: "/ext/bucket.html" }, "Bucket list") : null));
   }
 
   function exportAll() {
@@ -298,7 +313,7 @@
   }
 
   async function wipe() {
-    if (!confirm("Να σβηστούν όλοι οι ήρωες, η αποθήκη και τα blueprints; (κάνε πρώτα «Εξαγωγή» αν θες αντίγραφο)")) return;
+    if (!confirm("Delete all heroes, storage and blueprints? (Export a backup first if you may want them back.)")) return;
     await A.replaceAll({});
     load(await A.files());
     dirty = false;
@@ -312,7 +327,7 @@
       const doc = parse(await f.text(), null);
       if (!doc) { skipped.push(f.name); continue; }
       if (doc.format === "shoptitans-account/1" && doc.files) {
-        if (!confirm(`Το «${f.name}» αντικαθιστά όλο τον λογαριασμό. Συνέχεια;`)) continue;
+        if (!confirm(`“${f.name}” replaces your whole account. Continue?`)) continue;
         await A.replaceAll(doc.files);
         out.push(f.name);
         continue;
@@ -331,7 +346,7 @@
     load(await A.files());
     dirty = dirty || out.length > 0;
     render();
-    alert(`Μπήκαν ${out.length} αρχεία.` + (skipped.length ? `\nΔεν αναγνωρίστηκαν: ${skipped.join(", ")}` : ""));
+    alert(`Imported ${out.length} file(s).` + (skipped.length ? `\nNot recognised: ${skipped.join(", ")}` : ""));
   } });
 
   function render() {
@@ -345,5 +360,5 @@
     cat = await A.call("catalog");
     load(await A.files());
     render();
-  })().catch((err) => { root.replaceChildren(h("p", { class: "err" }, "Σφάλμα: " + err.message)); });
+  })().catch((err) => { root.replaceChildren(h("p", { class: "err" }, "Error: " + err.message)); });
 })();

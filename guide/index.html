@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="icon" href="/favicon.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<script src="/i18n/en.js?v=fe4eb30e67"></script>
+<script src="/st-i18n.js?v=fe4eb30e67"></script>
+<script src="/st-help.js?v=fe4eb30e67"></script>
+<script src="/config.js?v=fe4eb30e67"></script>
+<script src="/st-runtime.js?v=fe4eb30e67"></script>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shop Titans — Guide</title>
+<link rel="stylesheet" href="/static/app.css?v=fe4eb30e67">
+<link rel="stylesheet" href="/account.css?v=fe4eb30e67">
+<style>
+  .guide { max-width: 820px; }
+  .guide p, .guide li { line-height: 1.55; }
+  .guide dl { margin: 0; }
+  .guide dt { font-weight: 650; margin-top: .8rem; }
+  .guide dd { margin: .15rem 0 0; color: var(--text); line-height: 1.5; }
+  .guide .toc { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: .4rem 0 0; padding: 0; list-style: none; }
+  .guide table td, .guide table th { vertical-align: top; }
+  .guide .tag { display: inline-block; padding: 0 .45rem; border-radius: 6px; background: var(--accent-soft); font-size: .85rem; }
+</style>
+<script>try{var t=localStorage.getItem("st-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="stylesheet" href="/static/site.css?v=fe4eb30e67">
+<link rel="stylesheet" href="/static/info.css?v=fe4eb30e67">
+<script src="/static/info.js?v=fe4eb30e67" defer></script>
+<script src="/static/nav.js?v=fe4eb30e67" defer></script>
+</head>
+<body>
+<header class="st-nav" data-st-nav>
+<a class="st-brand" href="/">Shop Titans</a>
+<nav class="st-tabs" aria-label="Ενότητες"><a class="st-tab" href="/account/" data-id="account" data-order="5">Account</a><a class="st-tab" href="/" data-id="heroes" data-order="10">Ήρωες</a><a class="st-tab" href="/team" data-id="team" data-order="20">Ομάδα</a><a class="st-tab" href="/ext/bucket.html" data-id="bucket" data-order="50">Bucket list</a><a class="st-tab" href="/guide/" data-id="guide" data-order="90" aria-current="page">Guide</a></nav>
+<button class="st-theme" id="st-theme-btn" type="button" aria-label="Αλλαγή θέματος" title="Θέμα">◐</button>
+</header>
+
+<main class="acct guide" data-no-i18n>
+
+<section class="card">
+  <h1>Guide</h1>
+  <p>This site helps you make every hero and champion in <b>Shop Titans</b> as strong as possible. You type in your
+    heroes once; it compares each one against the best build it can reach and tells you, slot by slot, what to
+    change and where to get it. It is a free guild tool, not made by or affiliated with Kabam.</p>
+  <ul class="toc">
+    <li><a href="#start">Quick start</a></li><li><a href="#pages">The pages</a></li>
+    <li><a href="#review">Reading a review</a></li><li><a href="#rules">How it chooses</a></li>
+    <li><a href="#terms">Glossary</a></li><li><a href="#data">Your data</a></li><li><a href="#faq">FAQ</a></li>
+  </ul>
+</section>
+
+<section class="card" id="start">
+  <h2>Quick start (10 minutes)</h2>
+  <ol class="steps">
+    <li><b>Sign in with Discord</b> (top right). You can also try it without signing in; then your data stays in this browser only.</li>
+    <li>Open <a href="/account/">Account</a> and press <b>+ New hero</b>. Copy the hero from the game: class, level,
+      <b>power</b> (required), the 4 skills, and the item in each of the 6 slots with its quality, element and spirit.
+      Every field has a short hint under it. Start with your 3–5 strongest heroes.</li>
+    <li>Optional but worth it: add your <b>storage</b> (Epic/Legendary items and enchants, Titan Souls, skill dice) and your
+      <b>blueprints</b>. Without them the site still works, but it cannot tell you "use the one in your storage" or "craft it yourself".</li>
+    <li>Press <b>Compute</b>. It takes about 10–60 seconds per hero, depending on your device. Keep the tab open and in front (browsers slow down background tabs).</li>
+    <li>Open <a href="/">Heroes</a>, pick a hero, and scroll to <b>Review / what-if</b>. Then look at the
+      <a href="/ext/bucket.html">Bucket list</a> for your shopping list.</li>
+  </ol>
+  <p class="muted">After you change something in the game (new item, enchant, level), update the hero in Account and press Compute again.</p>
+</section>
+
+<section class="card" id="pages">
+  <h2>The pages</h2>
+  <dl>
+    <dt>Account</dt>
+    <dd>Where your data lives: heroes, storage, blueprints. Import / Export make a backup file or move data between
+      browsers. Compute runs the review for all heroes.</dd>
+    <dt>Heroes</dt>
+    <dd>One hero at a time (pick it at the top). You see the class, skills with their tiers, the stats as the game
+      shows them next to the site's own calculation ("calc"), the element bar, and the 6 slots. Every stat opens a popup with
+      the maths behind it. At the bottom, <b>Review / what-if</b> shows how far the hero is from their best build and what to change.</dd>
+    <dt>Team</dt>
+    <dd>Your whole roster in charts: power now and after the plan, gear quality per slot, missing enchants, class
+      and element coverage, and skill ratings. Every chart has a one-line takeaway and a table with the numbers.</dd>
+    <dt>Bucket list</dt>
+    <dd>Everything you need to gather for the plan, grouped by upgrade (one hero slot, or one promotion), with
+      needed / you have / missing, biggest win first. You can type how many you already have; the list keeps your numbers.</dd>
+    <dt>Names everywhere</dt>
+    <dd>Any item, spirit, element or skill name on any page is a link: tap it for what it does, its stats per quality and how to get it.</dd>
+  </dl>
+</section>
+
+<section class="card" id="review">
+  <h2>Reading a hero's review</h2>
+  <dl>
+    <dt>"82.7% of the best possible → 99.5% with the plan"</dt>
+    <dd>The first number is the hero's power now compared with their <b>ceiling</b>: the best build they can wear
+      (any item in Epic, plus your own Legendaries, with the best enchants), keeping today's skills. The second is where
+      the hero ends up if you follow the plan.</dd>
+    <dt>Big gaps</dt>
+    <dd>The few things that matter most for this hero: a promotion that is waiting, an element too low for the next
+      skill tier, a weak skill worth rerolling, items below Epic, or one slot that is far behind.</dd>
+    <dt>Per slot</dt>
+    <dd>What the slot wears now and the recommended change: item, quality, element and spirit, the <b>power gain</b>
+      (measured by the calculator, not guessed), and the <b>source</b>:
+      <span class="tag">Storage</span> already yours, free ·
+      <span class="tag">Craft</span> you have the blueprint ·
+      <span class="tag">Market</span> buy it from other players ·
+      <span class="tag">Rare</span> Antique Store, packs or events, only if you happen to have it.
+      Sometimes a Market or Legendary option is listed on the side when it is clearly better.</dd>
+    <dt>What-if</dt>
+    <dd>Try any item, quality, element or spirit in any slot and see the new stats and power before you spend anything in the game.</dd>
+    <dt>Confidence</dt>
+    <dd>How close the calculator's power is to the power you typed. High (within 1%): the numbers are solid.
+      Medium (within 5%): the order of moves is right, exact gains may be a little off. Low: check what you typed
+      (a wrong quality or a missing enchant is the usual cause); the ranking still helps.</dd>
+    <dt>Skills</dt>
+    <dd>Each skill has a community rating for its class (S best, then A, B, C, D). B and below are reroll
+      candidates; the review shows the chance a reroll gives something better or worse.</dd>
+  </dl>
+</section>
+
+<section class="card" id="rules">
+  <h2>How it chooses</h2>
+  <ul>
+    <li><b>Epic is the default.</b> Lower qualities are never suggested. Legendary only where the gain is big, because Legendaries are hard to get.</li>
+    <li><b>What you own comes first</b> (free), then <b>craft</b> (cheaper than buying), then the <b>Market</b>, then rare sources.</li>
+    <li><b>Each stored item and enchant goes to one hero only</b>, the one it helps most, so two heroes never count on the same piece.</li>
+    <li><b>Luck is marked as luck.</b> Skill rerolls (dice) and Legendary fusion can end worse; the site shows the odds and never treats them as sure.</li>
+    <li><b>Gems are never part of the plan.</b></li>
+    <li><b>Every gain is calculated</b>, using the game's formulas and data, and checked against the power you typed.</li>
+  </ul>
+</section>
+
+<section class="card" id="terms">
+  <h2>Glossary</h2>
+  <dl>
+    <dt>Power</dt><dd>The hero's power number in the game. The site needs it to check its own maths.</dd>
+    <dt>calc</dt><dd>The site's calculator: it rebuilds the hero's stats and power from class, level, items, enchants, skills and card level.</dd>
+    <dt>Ceiling</dt><dd>The strongest build the hero can wear today (see "Reading a hero's review").</dd>
+    <dt>Plan</dt><dd>The set of changes the review recommends across all heroes, with each stored piece given to one hero.</dd>
+    <dt>Element</dt><dd>The hero's element number. Skills reach higher tiers (T2–T4) when the element passes thresholds; the Heroes page shows the bar and the thresholds.</dd>
+    <dt>Element / spirit enchant</dt><dd>The two enchant boxes on every item. Elements add stats and element points; spirits add effects (e.g. +8% Attack).</dd>
+    <dt>Affinity</dt><dd>Some items have an element or spirit they "like"; that enchant gives a bigger bonus on that item.</dd>
+    <dt>Promotion · Titan Soul</dt><dd>Promoting a hero (e.g. Ninja → Sensei) needs a Titan Soul and raises their stats and skill tiers. The review measures the gain.</dd>
+    <dt>Reroll · skill dice</dt><dd>Changing one skill at random with a Basic, Super, Mega or Perfect Skill Die. The reroll planner says which skill to roll and when to stop.</dd>
+    <dt>Seeds</dt><dd>Permanent stat boosts (Vitality, Power, Resistance). The game does not show how many a hero has, so the site estimates it.</dd>
+    <dt>Card level</dt><dd>The class card in Collection Book → Card Collection; it raises the hero's stats a little.</dd>
+    <dt>Needed / Have / Missing</dt><dd>Bucket list columns: how many the plan needs, how many you own, how many you still have to craft or buy.</dd>
+    <dt>STC BiS</dt><dd>The community's "best in slot" set for the class, shown for comparison.</dd>
+  </dl>
+</section>
+
+<section class="card" id="data">
+  <h2>Your data</h2>
+  <ul>
+    <li>Signed in with Discord: your heroes, storage and blueprints are stored in a database row that only your account can read or write. The site only gets your Discord name, avatar and e-mail.</li>
+    <li>Not signed in: everything stays in this browser. Clearing the browser's data deletes it, so use <b>Export</b> for a backup.</li>
+    <li>The calculations run in your own browser. Nothing about your heroes is sent anywhere else.</li>
+    <li>Results (reviews, plan, bucket list) are kept on the device you computed them on; on a new device press Compute once.</li>
+  </ul>
+</section>
+
+<section class="card" id="faq">
+  <h2>FAQ</h2>
+  <dl>
+    <dt>Why is Compute slow?</dt>
+    <dd>For every hero it tries every useful item, quality and enchant in every slot, and calculates the real power of each. That runs on your device: about 10–60 seconds per hero. A computer is faster than a phone, and a tab in front is faster than one in the background.</dd>
+    <dt>The calc power differs from the game.</dt>
+    <dd>Check the qualities (Epic vs Legendary), the enchants and the card level you typed. Seeds the game does not show can also explain a small gap.</dd>
+    <dt>I can't find an item in the list.</dt>
+    <dd>The lists only show items that fit that slot for that class, from tier 8 up. Newer items appear after the game data is updated.</dd>
+    <dt>Does it work on a phone?</dt>
+    <dd>Yes. The first load is heavier (about 15 MB); after that it is quicker.</dd>
+    <dt>Some text mentions "the phone" or "a session".</dt>
+    <dd>The tool started as one player's helper that reads the game from their phone. For you, "the phone" means what you typed in Account.</dd>
+  </dl>
+</section>
+
+</main>
+</body>
+</html>

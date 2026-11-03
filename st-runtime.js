@@ -9,10 +9,13 @@
   const CFG = window.ST_CONFIG || {};
   const SUPABASE_JS = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js";
   const LOCAL_ID = "local";
+  // pages that need no data (the guide): readable at once, without the login or loading panel
+  const PASSIVE = /^\/guide\/?/.test(location.pathname);
   const MUTATING = [/^\/api\/bucket\/(edit|resolve|regenerate)$/, /^\/api\/review\/(run|rerolls\/run)$/];
 
   // ------------------------------------------------------------ worker
-  const worker = new Worker("/st-worker.js");
+  const VERSION = (document.currentScript && new URL(document.currentScript.src).searchParams.get("v")) || "";
+  const worker = new Worker("/st-worker.js" + (VERSION ? "?v=" + VERSION : ""));
   let seq = 0;
   const waiting = new Map();
   const listeners = new Set();
@@ -65,7 +68,7 @@
       const s = document.createElement("script");
       s.src = src;
       s.onload = res;
-      s.onerror = () => rej(new Error("δεν φόρτωσε " + src));
+      s.onerror = () => rej(new Error("could not load " + src));
       document.head.appendChild(s);
     });
   }
@@ -119,7 +122,7 @@
           state.saved = true;
           state.error = null;
         } catch (err) {
-          state.error = "δεν αποθηκεύτηκε: " + err.message;
+          state.error = "not saved: " + err.message;
         }
         paintChip();
       });
@@ -156,7 +159,7 @@
       const { data } = await client.auth.getSession();
       if (data.session) return start(who(data.session));
     }
-    if (localStorage.getItem("st-local") === "1" || !client) return start({ id: LOCAL_ID, mode: "local", name: "αυτός ο browser" });
+    if (localStorage.getItem("st-local") === "1" || !client) return start({ id: LOCAL_ID, mode: "local", name: "this browser" });
     state.phase = "login";
     paintPanel();
   }
@@ -210,48 +213,49 @@
   function paintChip() {
     const nav = document.querySelector("[data-st-nav]");
     if (!nav) return;
-    if (!chip) { chip = el("div", { class: "st-acct" }); nav.insertBefore(chip, nav.querySelector(".st-theme")); }
+    if (!chip) { chip = el("div", { class: "st-acct", "data-no-i18n": "" }); nav.insertBefore(chip, nav.querySelector(".st-theme")); }
     chip.replaceChildren();
     if (!user) {
-      if (state.phase === "login") chip.append(el("button", { onclick: signIn }, "Σύνδεση με Discord"));
+      if (state.phase === "login") chip.append(el("button", { onclick: signIn }, "Sign in with Discord"));
       return;
     }
     const dot = el("span", { class: "st-dot" + (state.error ? " err" : state.saved ? "" : " busy"),
-                             title: state.error || (state.saved ? "αποθηκεύτηκε" : "αποθηκεύεται…") });
+                             title: state.error || (state.saved ? "saved" : "saving…") });
     if (user.avatar) chip.append(el("img", { src: user.avatar, alt: "" }));
     chip.append(el("span", {}, user.name), dot,
-                el("button", { onclick: signOut }, user.mode === "local" ? "Σύνδεση" : "Έξοδος"));
+                el("button", { onclick: signOut }, user.mode === "local" ? "Sign in" : "Sign out"));
   }
 
   function paintPanel(progress) {
     if (!document.body) return; // DOMContentLoaded paints it
-    if (!gate) { gate = el("div", { class: "st-gate", role: "dialog", "aria-modal": "true" }); }
+    if (PASSIVE && state.phase !== "computing") { if (gate) gate.remove(); return; }
+    if (!gate) { gate = el("div", { class: "st-gate", role: "dialog", "aria-modal": "true", "data-no-i18n": "" }); }
     const box = el("div", { class: "box" });
     if (state.phase === "login") {
-      box.append(el("h2", {}, "Shop Titans — οι ήρωές σου"),
-        el("p", {}, "Βάζεις τους ήρωές σου και το site λέει τι να αλλάξεις σε κάθε slot (item, element, spirit), " +
-                    "τι λείπει από το ιδανικό build και ποια skills να κάνεις reroll."),
-        el("p", {}, "Με τη σύνδεση, τα δεδομένα σου είναι μόνο δικά σου και τα βλέπεις από κάθε συσκευή."),
+      box.append(el("h2", {}, "Shop Titans — guild helper"),
+        el("p", {}, "Enter your heroes and the site tells you what to change in every slot (item, element, spirit), " +
+                    "what is missing from each hero's best build, and which skills are worth a reroll."),
+        el("p", {}, "Sign in with Discord to keep your data private to you and see it on any device. We only get your Discord name and avatar."),
         el("div", { class: "row" },
-          el("button", { class: "discord", onclick: signIn }, "Σύνδεση με Discord"),
-          el("button", { onclick: () => { localStorage.setItem("st-local", "1"); start({ id: LOCAL_ID, mode: "local", name: "αυτός ο browser" }); } },
-             "Δοκιμή χωρίς σύνδεση (μένει σε αυτόν τον browser)")));
+          el("button", { class: "discord", onclick: signIn }, "Sign in with Discord"),
+          el("button", { onclick: () => { localStorage.setItem("st-local", "1"); start({ id: LOCAL_ID, mode: "local", name: "this browser" }); } },
+             "Try it without signing in (data stays in this browser)")));
     } else if (state.phase === "loading") {
-      box.append(el("h2", {}, "Φορτώνει…"),
-        el("p", {}, "Ο υπολογιστής του site τρέχει μέσα στον browser σου. Την πρώτη φορά κατεβαίνουν ~15 MB."),
+      box.append(el("h2", {}, "Loading…"),
+        el("p", {}, "The calculator runs inside your browser, so nothing is sent to a server. The first visit downloads about 15 MB; later visits are faster."),
         el("progress", {}));
     } else if (state.phase === "computing") {
       const p = progress || {};
       const label = p.step === "review" ? `Review: ${p.hero} (${p.done + 1}/${p.total})`
-        : p.step === "rerolls" ? `Skills/reroll: ${p.hero} (${p.done + 1}/${p.total})`
-          : p.step === "plan" ? "Πλάνο…" : p.step === "bucket" ? "Bucket list…" : "Ξεκινάει…";
+        : p.step === "rerolls" ? `Skills / rerolls: ${p.hero} (${p.done + 1}/${p.total})`
+          : p.step === "plan" ? "Plan…" : p.step === "bucket" ? "Bucket list…" : "Starting…";
       const frac = p.total ? ((p.step === "rerolls" ? p.total : 0) + (p.done || 0)) / (2 * p.total) : 0;
-      box.append(el("h2", {}, "Υπολογισμός"), el("p", {}, label),
-        el("p", {}, "Περίπου 5–10 δευτερόλεπτα ανά ήρωα. Μην κλείσεις τη σελίδα."),
+      box.append(el("h2", {}, "Computing"), el("p", {}, label),
+        el("p", {}, "About 10–60 seconds per hero. Keep this tab open and in front."),
         el("progress", { max: "1", value: String(p.step === "plan" || p.step === "bucket" ? 1 : frac) }));
     } else if (state.phase === "error") {
-      box.append(el("h2", {}, "Κάτι δεν πήγε καλά"), el("p", { class: "err" }, state.error || ""),
-        el("div", { class: "row" }, el("button", { onclick: () => location.reload() }, "Ξανά")));
+      box.append(el("h2", {}, "Something went wrong"), el("p", { class: "err" }, state.error || ""),
+        el("div", { class: "row" }, el("button", { onclick: () => location.reload() }, "Try again")));
     } else {
       gate.remove();
       return;
@@ -262,7 +266,7 @@
 
   async function signIn() {
     const client = await supabaseClient();
-    if (!client) { alert("Η σύνδεση με Discord δεν έχει στηθεί ακόμα σε αυτό το site."); return; }
+    if (!client) { alert("Discord sign-in is not set up on this site yet."); return; }
     localStorage.removeItem("st-local");
     await client.auth.signInWithOAuth({ provider: "discord", options: { redirectTo: location.origin + location.pathname } });
   }
