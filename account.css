@@ -1,0 +1,54 @@
+/* The account page of the public site: heroes, storage, blueprints, import / export. Tokens from app.css. */
+.acct { max-width: 1100px; margin: 0 auto; padding: 16px; box-sizing: border-box; }
+.acct h1 { font-size: 1.4rem; margin: .2rem 0 .4rem; }
+.acct h2 { font-size: 1.1rem; margin: 0 0 .6rem; display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+.acct h2 .grow { flex: 1; }
+.acct .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px;
+  margin: 0 0 16px; box-shadow: var(--shadow); }
+.acct .muted { color: var(--muted); }
+.acct .steps { margin: .4rem 0 0; padding-left: 1.2rem; line-height: 1.6; }
+.acct .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.acct button, .acct .btn { font: inherit; cursor: pointer; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--card-2); color: var(--text); padding: .4rem .8rem; }
+.acct button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+.acct button.danger { color: var(--bad); }
+.acct button.small { padding: .15rem .5rem; font-size: .85rem; }
+.acct input, .acct select { font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line);
+  border-radius: 7px; padding: .3rem .45rem; min-width: 0; box-sizing: border-box; }
+.acct input.bad { border-color: var(--bad); background: var(--bad-soft); }
+.acct label.f { display: flex; flex-direction: column; gap: 3px; font-size: .85rem; color: var(--muted); }
+.acct label.f > input, .acct label.f > select { color: var(--text); font-size: 1rem; }
+.acct .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+.acct .banner { background: var(--warn-soft); color: var(--warn); border-radius: 10px; padding: 10px 12px;
+  margin: 0 0 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.acct .banner.ok { background: var(--ok-soft); color: var(--ok); }
+.acct .banner .grow { flex: 1; }
+
+.acct .heroes { display: flex; flex-direction: column; gap: 8px; }
+.acct .hero-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 8px 10px;
+  border: 1px solid var(--line); border-radius: 10px; background: var(--card-2); }
+.acct .hero-row .name { font-weight: 650; min-width: 120px; }
+.acct .hero-row .gear { flex: 1; font-size: .85rem; color: var(--muted); min-width: 200px; }
+
+.acct .slots { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.acct .slot { display: grid; grid-template-columns: 90px 2fr 120px 1.4fr 1.4fr; gap: 8px; align-items: center; }
+.acct .slot .lbl { font-size: .82rem; color: var(--muted); line-height: 1.2; }
+.acct .skills { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin-top: 12px; }
+
+.acct table { width: 100%; border-collapse: collapse; }
+.acct td, .acct th { padding: 4px 6px; text-align: left; border-bottom: 1px solid var(--line); }
+.acct th { font-size: .8rem; color: var(--muted); font-weight: 500; }
+.acct td input { width: 100%; }
+.acct td.n input { width: 80px; }
+.acct .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.acct .chip { display: inline-flex; gap: 6px; align-items: center; padding: 3px 4px 3px 10px; border-radius: 999px;
+  background: var(--accent-soft); font-size: .88rem; }
+.acct .chip button { border: 0; background: transparent; padding: 0 6px; }
+.acct .err { color: var(--bad); font-size: .85rem; }
+
+@media (max-width: 720px) {
+  .acct { padding: 12px; }
+  .acct .slot { grid-template-columns: 1fr 110px; }
+  .acct .slot .lbl { grid-column: 1 / -1; }
+  .acct .slot .el, .acct .slot .sp { grid-column: span 1; }
+}

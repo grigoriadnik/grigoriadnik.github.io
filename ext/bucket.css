@@ -1,0 +1,195 @@
+/* Bucket list page (/ext/bucket.html) and its small panel on the heroes page. Colours: app.css tokens. */
+main#bucket-app { max-width: 1240px; }
+body.bk-busy { cursor: progress; }
+body.bk-busy main#bucket-app { opacity: .7; }
+
+/* summary */
+.bk-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+.bk-stat { background: var(--card-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.bk-stat .n { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.bk-stat .l { color: var(--muted); font-size: 12px; }
+.bk-stat.ok { background: var(--ok-soft); border-color: transparent; }
+.bk-stat.ok .n { color: var(--ok); }
+.bk-explain { margin: 10px 0 0; }
+.bk-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+.bk-btn {
+  font: inherit; cursor: pointer; border-radius: 8px; padding: 6px 12px;
+  background: var(--accent); color: #fff; border: 1px solid var(--accent);
+}
+.bk-btn.ghost { background: transparent; color: var(--text); border-color: var(--line); }
+.bk-btn:hover { filter: brightness(1.05); }
+.bk-btn:focus-visible, .bk-tab:focus-visible, .bk-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* power per hero */
+.bk-power summary { cursor: pointer; font-weight: 600; }
+.bk-power p { margin: 8px 0; }
+.bk-pwrap { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.bk-ptable { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.bk-ptable th { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; text-align: left; padding: 0 6px 4px; }
+.bk-ptable td { padding: 4px 6px; border-top: 1px solid var(--line); }
+.bk-ptable .n { text-align: right; white-space: nowrap; }
+.bk-ptable tfoot td { font-weight: 700; border-top: 2px solid var(--line); }
+.bk-up { color: var(--ok); }
+.bk-pscroll { overflow-x: auto; min-width: 0; }
+.bk-ptable td:first-child { white-space: nowrap; }
+@media (max-width: 1240px) { .bk-pwrap { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { .bk-ptable th:last-child, .bk-ptable td:last-child { display: none; } }
+
+/* alerts */
+.bk-alerts { display: grid; gap: 10px; }
+.bk-alerts:empty { display: none; }
+.bk-conflict { display: grid; grid-template-columns: minmax(0, 1.2fr) auto auto; gap: 12px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); }
+.bk-conflict .bk-actions { margin: 0; }
+.bk-changes summary { cursor: pointer; font-weight: 600; }
+.bk-changes > div { margin-top: 6px; font-size: 13px; }
+
+/* controls */
+.bk-controls {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+  position: sticky; top: 51px; z-index: 4; padding: 8px 0;
+  background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(6px);
+}
+.bk-tabs { display: inline-flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+.bk-tab { font: inherit; border: 0; background: var(--card); color: var(--text); padding: 6px 12px; cursor: pointer; }
+.bk-tab + .bk-tab { border-left: 1px solid var(--line); }
+.bk-tab.on { background: var(--accent); color: #fff; }
+.bk-chips { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+.bk-chip { font: inherit; font-size: 13px; border: 1px solid var(--line); background: var(--card); color: var(--text); border-radius: 999px; padding: 4px 11px; cursor: pointer; }
+.bk-chip.on { background: var(--accent-soft); color: var(--accent); border-color: transparent; font-weight: 600; }
+.bk-check { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: var(--muted); }
+.bk-search {
+  margin-left: auto; font: inherit; color: var(--text); background: var(--card);
+  border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; min-width: 200px;
+}
+
+/* tiers and groups */
+.bk-groups { display: grid; gap: 14px; }
+.bk-tier { display: grid; gap: 10px; }
+.bk-tierh {
+  display: flex; align-items: baseline; gap: 8px; margin: 4px 0 0; cursor: pointer;
+  font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--muted);
+}
+.bk-tierh .small { text-transform: none; letter-spacing: 0; font-weight: 400; }
+details.bk-tier > summary { list-style: none; }
+details.bk-tier > summary::-webkit-details-marker { display: none; }
+details.bk-tier > summary::before { content: "▸"; display: inline-block; transition: transform .15s; }
+details.bk-tier[open] > summary::before { transform: rotate(90deg); }
+.bk-tier.ready > .bk-tierh { color: var(--ok); }
+.bk-count { font-size: 12px; padding: 0 7px; border-radius: 999px; background: var(--card-2); border: 1px solid var(--line); color: var(--text); }
+
+.bk-group {
+  background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--line);
+  border-radius: 12px; padding: 12px 14px; box-shadow: var(--shadow); min-width: 0;
+}
+.bk-group.ready { border-left-color: var(--ok); background: color-mix(in srgb, var(--ok-soft) 45%, var(--card)); }
+.bk-ghead { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto auto; gap: 10px; align-items: center; }
+.bk-rank { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 30px; }
+.bk-gicon { width: 40px; height: 40px; border-radius: 8px; background: var(--card-2); object-fit: contain; }
+.bk-gname { font-weight: 600; }
+.bk-gtitle .chip { margin-left: 2px; }
+.bk-gain { text-align: right; }
+.bk-gain .n { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ok); }
+.bk-badge { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+.bk-badge.ok { background: var(--ok); color: #fff; }
+.bk-badge.miss { background: var(--warn-soft); color: var(--warn); }
+
+/* needs table */
+.bk-needs { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+.bk-needs th {
+  text-align: left; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase;
+  letter-spacing: .4px; padding: 0 8px 4px; white-space: nowrap;
+}
+.bk-needs th small { text-transform: none; letter-spacing: 0; font-weight: 400; }
+.bk-needs td { padding: 6px 8px; border-top: 1px solid var(--line); vertical-align: middle; }
+.bk-needs .c { text-align: center; }
+.bk-what { display: flex; gap: 8px; align-items: center; min-width: 0; }
+.bk-icon { width: 28px; height: 28px; border-radius: 6px; background: var(--card-2); object-fit: contain; flex: none; }
+.bk-noicon { display: inline-block; }
+.bk-name { font-weight: 600; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.bk-sub { font-size: 11px; color: var(--muted); }
+.bk-q { font-size: 11px; font-weight: 700; padding: 0 6px; border-radius: 5px; border: 1px solid currentColor; }
+.bk-q.q-epic { color: var(--q-epic); }
+.bk-q.q-legendary { color: var(--q-legendary); }
+.bk-tag { font-size: 11px; font-weight: 400; padding: 0 6px; border-radius: 5px; background: var(--card-2); border: 1px solid var(--line); color: var(--muted); }
+.bk-howtag { font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--card-2); border: 1px solid var(--line); white-space: nowrap; }
+.bk-how.k-craft .bk-howtag { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
+.bk-how.k-market .bk-howtag, .bk-how.k-special .bk-howtag, .bk-how.k-luck .bk-howtag { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+.bk-how.k-enchant .bk-howtag, .bk-how.k-event .bk-howtag { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+.bk-miss { color: var(--warn); font-weight: 600; white-space: nowrap; }
+.bk-ok { color: var(--ok); font-weight: 700; }
+/* Titan Soul: one entry, its uses ranked (each soul to the next one) */
+.bk-stat .n small { font-size: 14px; font-weight: 500; color: var(--muted); }
+.bk-souls td.n, .bk-souls th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bk-souls tr.ok td:first-child b { color: var(--ok); }
+.bk-souls tr.bk-dim { opacity: .45; }
+.bk-souls .chip { margin-left: 6px; }
+/* priority order: what the group needs gathered, as a tag; per-item power */
+.chip.bk-src { font-weight: 600; }
+.chip.bk-src.t0 { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
+.chip.bk-src.t1 { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+.chip.bk-src.t2, .chip.bk-src.t3 { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+.bk-etable td.n, .bk-etable th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* «Ανά πράγμα»: sortable headers; on a phone the «Ταξινόμηση» select */
+.bk-sort { font: inherit; text-transform: inherit; letter-spacing: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; text-align: inherit; }
+.bk-sort:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+.bk-sortable.on .bk-sort { color: var(--text); }
+.bk-arrow { font-size: 10px; opacity: .45; }
+.bk-sortable.on .bk-arrow { opacity: 1; color: var(--accent); }
+.bk-etable td:first-child { min-width: 170px; }
+/* names that open the shared info popup (data-info) */
+.bk-info, .bk-what[data-info] .bk-nm { text-decoration: underline dotted color-mix(in srgb, currentColor 45%, transparent); text-underline-offset: 3px; }
+.bk-info:hover, .bk-what[data-info]:hover .bk-nm { text-decoration-style: solid; }
+.bk-info:focus-visible, .bk-what[data-info]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+/* Titan Soul's «Για»: one line, the ranking folds out */
+.bk-more summary { cursor: pointer; }
+.bk-more summary::marker { color: var(--muted); }
+.bk-uses { margin: 4px 0 0; padding-left: 20px; color: var(--muted); }
+.bk-uses li.ok { color: var(--ok); }
+.bk-esort { display: none; }
+.bk-esel { flex: 1; min-width: 0; font: inherit; font-size: 13px; color: var(--text); background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; }
+@media (max-width: 760px) { .bk-esort { display: flex; gap: 8px; align-items: center; } }
+.bk-rem { font-weight: 700; font-variant-numeric: tabular-nums; }
+.bk-rem.miss { color: var(--warn); }
+.bk-cellrow { display: flex; align-items: center; gap: 4px; }
+.bk-qty {
+  width: 72px; font: inherit; font-variant-numeric: tabular-nums; color: var(--text); background: var(--card-2);
+  border: 1px solid var(--line); border-radius: 7px; padding: 4px 6px; text-align: right;
+}
+.bk-qty:focus { outline: 2px solid var(--accent); outline-offset: 0; background: var(--card); }
+.bk-qty.own { border-color: var(--accent); background: var(--accent-soft); }
+.bk-reset { font: inherit; font-size: 13px; border: 0; background: none; color: var(--accent); cursor: pointer; padding: 0 3px; }
+.bk-hint { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.bk-hint.bad { color: var(--bad); font-weight: 600; }
+.bk-hint.warn { color: var(--warn); }
+.bk-done { width: 18px; height: 18px; accent-color: var(--ok); cursor: pointer; }
+.bk-done:disabled { cursor: default; opacity: .7; }
+.bk-notes { margin: 8px 0 0; padding-left: 18px; }
+.bk-notes li + li { margin-top: 2px; }
+
+/* toast */
+.bk-toast {
+  position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 20;
+  background: var(--text); color: var(--bg); padding: 8px 14px; border-radius: 999px; font-size: 13px; box-shadow: var(--shadow);
+}
+.bk-toast.bad { background: var(--bad); color: #fff; }
+
+/* the panel on the heroes page */
+.bk-mini { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.bk-mini li { padding: 8px 10px; border-radius: 8px; background: var(--card-2); border: 1px solid var(--line); }
+.bk-mini li.ready { background: var(--ok-soft); border-color: transparent; }
+
+
+@media (max-width: 760px) {
+  .bk-controls { top: 0; position: static; }
+  .bk-search { margin-left: 0; width: 100%; min-width: 0; }
+  .bk-ghead { grid-template-columns: minmax(0, 1fr) auto; }
+  .bk-ghead .bk-rank, .bk-ghead .bk-gicon { display: none; }
+  .bk-ghead .bk-badge { grid-column: 1 / -1; justify-self: start; }
+  .bk-conflict { grid-template-columns: minmax(0, 1fr); }
+  .bk-needs thead { display: none; }
+  .bk-needs, .bk-needs tbody, .bk-needs tr, .bk-needs td { display: block; width: 100%; }
+  .bk-needs tr { border-top: 1px solid var(--line); padding: 6px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; }
+  .bk-needs td { border: 0; padding: 2px 0; text-align: left !important; }
+  .bk-needs td:first-child { grid-column: 1 / -1; }
+  .bk-needs td[data-l]:not(:first-child)::before { content: attr(data-l); display: block; font-size: 10px; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); }
+}

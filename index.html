@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="el">
+<head>
+<script src="/config.js"></script>
+<script src="/st-runtime.js"></script>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shop Titans — Ήρωες</title>
+<link rel="stylesheet" href="/static/app.css">
+<script>try{var t=localStorage.getItem("st-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="stylesheet" href="/static/site.css">
+<link rel="stylesheet" href="/static/info.css">
+<script src="/static/info.js" defer></script>
+<script src="/static/nav.js" defer></script>
+</head>
+<body>
+<header class="st-nav" data-st-nav>
+<a class="st-brand" href="/">Shop Titans</a>
+<nav class="st-tabs" aria-label="Ενότητες"><a class="st-tab" href="/account/" data-id="account" data-order="5">Λογαριασμός</a><a class="st-tab" href="/" data-id="heroes" data-order="10" aria-current="page">Ήρωες</a><a class="st-tab" href="/team" data-id="team" data-order="20">Ομάδα</a><a class="st-tab" href="/ext/bucket.html" data-id="bucket" data-order="50">Bucket list</a></nav>
+<button class="st-theme" id="st-theme-btn" type="button" aria-label="Αλλαγή θέματος" title="Θέμα">◐</button>
+</header>
+
+<div class="st-subbar">
+  <label class="picker">
+    <span class="sr">Ήρωας</span>
+    <select id="unit-select" aria-label="Διάλεξε ήρωα"><option>Φόρτωση…</option></select>
+  </label>
+  <span id="source-pill" class="pill" hidden></span>
+  <span id="calc-pill" class="pill" hidden></span>
+</div>
+
+<main id="app">
+  <p class="muted loading">Φόρτωση…</p>
+</main>
+
+<dialog id="popup" aria-labelledby="popup-title">
+  <form method="dialog" class="popup-head">
+    <h2 id="popup-title"></h2>
+    <button class="icon-btn" value="close" aria-label="Κλείσιμο">✕</button>
+  </form>
+  <div id="popup-body"></div>
+</dialog>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

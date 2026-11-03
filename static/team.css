@@ -1,0 +1,115 @@
+/* The «Ομάδα» page (team.js). Chart colours: the dataviz reference palette's first two categorical slots, each
+   mode its own step. Quality: the game's hues, stepped per mode into the validator's lightness band (CVD and
+   normal-vision separation pass); Normal stays gray as in the game (below the chroma floor), and every segment
+   carries its count, the legend its name and the table everything. On :root, so the tooltip (outside main) has
+   them too. */
+:root {
+  --tm-s1: #2a78d6;
+  --tm-s2: #eb6834;
+  --tm-surface: var(--card);
+  --tm-grid: #e1e0d9;
+  --tm-axis: #c3c2b7;
+  --tm-ink-2: #52514e;
+  --tm-good: #006300;
+  --tm-track: #cde2fb;
+  --tm-q-normal: #8a9096;
+  --tm-q-superior: #43a047;
+  --tm-q-flawless: #1e9bd7;
+  --tm-q-epic: #9c4dff;
+  --tm-q-legendary: #e09c00;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    --tm-s1: #3987e5;
+    --tm-s2: #d95926;
+    --tm-grid: #2c2c2a;
+    --tm-axis: #383835;
+    --tm-ink-2: #c3c2b7;
+    --tm-good: #0ca30c;
+    --tm-track: #184f95;
+    --tm-q-normal: #80868c;
+    --tm-q-legendary: #c08400;
+  }
+}
+:root[data-theme="dark"] {
+  --tm-s1: #3987e5;
+  --tm-s2: #d95926;
+  --tm-grid: #2c2c2a;
+  --tm-axis: #383835;
+  --tm-ink-2: #c3c2b7;
+  --tm-good: #0ca30c;
+  --tm-track: #184f95;
+  --tm-q-normal: #80868c;
+  --tm-q-legendary: #c08400;
+}
+
+.tm-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.tm-grid > .wide { grid-column: 1 / -1; }
+@media (max-width: 860px) { .tm-grid { grid-template-columns: minmax(0, 1fr); } }
+.tm-card { display: grid; gap: 10px; align-content: start; }
+.tm-card > h2 { margin: 0; }
+.tm-sub { margin: -4px 0 0; }
+.tm-note { margin: 0; font-size: 13px; color: var(--tm-ink-2); border-left: 3px solid var(--line); padding-left: 10px; }
+.tm-note strong { color: var(--text); font-weight: 600; }
+
+/* headline */
+.tm-heads { display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 860px) { .tm-heads { grid-template-columns: repeat(2, minmax(0, 1fr)); } .tm-heads .hero { grid-column: 1 / -1; } }
+.tm-tile { background: var(--card-2); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; gap: 2px; align-content: start; }
+.tm-tile .k { font-size: 13px; color: var(--muted); }
+.tm-tile .v { font-size: 26px; font-weight: 650; line-height: 1.15; }
+.tm-tile.hero .v { font-size: 48px; }
+.tm-tile .d { font-size: 13px; color: var(--tm-ink-2); }
+.tm-tile .d .up { color: var(--tm-good); font-weight: 600; }
+
+/* charts */
+.tm-chart { width: 100%; min-width: 0; }
+.tm-chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.tm-chart text { font: 12px system-ui, -apple-system, "Segoe UI", sans-serif; fill: var(--text); }
+.tm-chart text.muted { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.tm-chart text.sub { fill: var(--muted); font-size: 11px; }
+.tm-chart .grid { stroke: var(--tm-grid); stroke-width: 1; }
+.tm-chart .axis { stroke: var(--tm-axis); stroke-width: 1; }
+.tm-chart .s1 { fill: var(--tm-s1); }
+.tm-chart .s2 { fill: var(--tm-s2); stroke: var(--tm-surface); stroke-width: 2; }
+.tm-chart .ceil { stroke: var(--tm-ink-2); stroke-width: 2; stroke-linecap: round; }
+.tm-chart .limit { stroke: var(--tm-ink-2); stroke-width: 1; }
+.tm-chart .hit { fill: transparent; cursor: default; outline: none; }
+.tm-chart .row:hover .s1, .tm-chart .row:focus-within .s1 { filter: brightness(1.12); }
+.tm-chart .row:hover .hit, .tm-chart .hit:focus-visible { fill: color-mix(in srgb, var(--text) 5%, transparent); }
+.tm-chart .seg-label { font-size: 12px; font-weight: 600; }
+
+.tm-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--tm-ink-2); }
+.tm-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.tm-legend i { display: inline-block; flex: none; }
+.tm-legend .sw-bar { width: 14px; height: 10px; border-radius: 2px; }
+.tm-legend .sw-dot { width: 10px; height: 10px; border-radius: 50%; }
+.tm-legend .sw-line { width: 2px; height: 14px; background: var(--tm-ink-2); border-radius: 1px; }
+.tm-legend b { color: var(--text); font-weight: 600; }
+
+.tm-meters { display: grid; gap: 8px; }
+.tm-meter { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; font-size: 13px; align-items: center; }
+.tm-meter .bar { grid-column: 1 / -1; height: 8px; border-radius: 4px; background: var(--tm-track); overflow: hidden; }
+.tm-meter .bar > i { display: block; height: 100%; background: var(--tm-s1); border-radius: 4px; }
+
+.tm-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px 22px; }
+.tm-two h3 { margin: 0 0 4px; font-size: 13px; font-weight: 600; color: var(--tm-ink-2); }
+
+.tm-table summary { cursor: pointer; font-size: 13px; color: var(--accent); width: max-content; }
+.tm-table > div { overflow-x: auto; margin-top: 8px; }
+.tm-table table { border-collapse: collapse; font-size: 13px; width: 100%; }
+.tm-table th { text-align: left; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--line); padding: 4px 8px; white-space: nowrap; }
+.tm-table td { border-bottom: 1px solid var(--line); padding: 4px 8px; white-space: nowrap; }
+.tm-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.tm-tip {
+  position: fixed; z-index: 30; pointer-events: none; max-width: 260px;
+  background: var(--card); color: var(--text); border: 1px solid var(--line); border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .18); padding: 8px 10px; font-size: 12.5px; display: grid; gap: 3px;
+}
+.tm-tip[hidden] { display: none; }
+.tm-tip .t { font-weight: 600; margin-bottom: 2px; }
+.tm-tip .r { display: grid; grid-template-columns: 12px auto minmax(0, 1fr); gap: 6px; align-items: center; }
+.tm-tip .r b { font-weight: 650; font-variant-numeric: tabular-nums; }
+.tm-tip .r span { color: var(--muted); }
+.tm-tip .key { width: 10px; height: 2px; border-radius: 1px; }
